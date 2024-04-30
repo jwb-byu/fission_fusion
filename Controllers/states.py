@@ -131,17 +131,28 @@ class NetworkRestState(State):
         self.agent.hunger += 2
         self.agent.site.resource_count -= 1
         # calculate group-id densities to determine how much more time they'll stay on site
-        num_group_neighbors = 0
+        num_in_groups = dict()
+        num_in_groups.update({tuple(self.agent.group_id): 0})
         if neighbors:
             for neighbor in neighbors:
-                if np.array_equal(self.agent.sim.get_agent_group_id(neighbor), self.agent.group_id):
-                    num_group_neighbors += 1
+                neighbor_group_id = tuple(self.agent.sim.get_agent_group_id(neighbor))
+                num_in_group = num_in_groups.setdefault(neighbor_group_id, 0)
+                num_in_groups.update({neighbor_group_id: num_in_group + 1})
 
-        # will eventually leave site if no group members are present OR if no neighbors present either
+        # leave if no one is there
         else:
             self.timer = 0
         
-        if self.timer == 0 or num_group_neighbors == 0 or self.agent.hunger >= MAX_HUNGER or not self.agent.site.is_available():
+        # find the group with the largest presence in site
+        biggest_group = tuple(self.agent.group_id)
+        for group in num_in_groups.keys():
+            if num_in_groups[biggest_group] < num_in_groups[group]:
+                biggest_group = group
+        # probabilistically switch to biggest group
+        if np.random.random() > 0.5:
+            self.agent.sim.change_agent_group(self.agent, biggest_group)
+
+        if self.timer == 0 or num_in_groups[tuple(self.agent.group_id)] == 0 or self.agent.hunger >= MAX_HUNGER or not self.agent.site.is_available():
             self.agent.speed = np.random.uniform(1.0, MAX_SPEED) # reset speed
             self.agent.theta = np.random.uniform(-np.pi, np.pi)
             self.agent.state = NetworkExploreState(NET_EXPLORE_NAME, (100, 255, 0), self.agent)

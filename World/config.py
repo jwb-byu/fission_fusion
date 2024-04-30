@@ -19,7 +19,7 @@ and add the (group number, color) key-value pair to COLORS """
 PINK = "#FF00FF"
 CYAN = "#00FFFF"
 GREEN = "#B0FF00"
-COLORS = {0: PINK, 1: CYAN, 2: GREEN} # a map between group number and group color
+COLORS = {(1, 0, 0): PINK, (0, 1, 0): CYAN, (0, 0, 1): GREEN} # a map between group number and group color
 
 # AGENT PROPERTIES
 USE_BOID_MOVE = True # toggles between pure Boid-like movement, or graph laplacian diffusion based movement

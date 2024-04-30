@@ -36,7 +36,7 @@ class Simulation:
             group_id[group_num] = 1
             group_sizes[group_num] += 1
 
-            self.agent_colors.append(COLORS.get(group_num))
+            self.agent_colors.append(COLORS.get(tuple(group_id)))
 
             pos = np.array([np.random.uniform(0, WORLD_SIZE), np.random.uniform(0, WORLD_SIZE)])
             speed = np.random.uniform(1.0, MAX_SPEED)
@@ -152,6 +152,14 @@ class Simulation:
 
         if out_of_bounds:
             agent.hunger += 1
+
+
+    """
+    Handles all the stuff associated with changing an agent's group_id
+    """
+    def change_agent_group(self, agent, new_group_id):
+        agent.group_id = np.array(new_group_id)
+        self.agent_colors[agent.id] = COLORS.get(new_group_id)
 
     """
     Updates the world conditions (agent positions, predator positions, site conditions, etc.)
