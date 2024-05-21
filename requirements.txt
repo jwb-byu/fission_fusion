@@ -1,3 +1,4 @@
 pygame == 2.4.0
 numpy >= 1.23
 matplotlib ~= 3.5
+py-trees == 2.2.3
